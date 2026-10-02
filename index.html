@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>风铃谷的四季</title>
+<link rel="stylesheet" href="assets/fonts/lxgw-wenkai/lxgwwenkai-regular.css">
+<link rel="stylesheet" href="assets/fonts/lxgw-wenkai/lxgwwenkai-bold.css">
+<link rel="stylesheet" href="css/ui.css">
+</head>
+<body>
+<!-- 竖屏提示（手机） -->
+<div id="rotate-tip"><div class="rotate-inner"><div class="rotate-icon">📱</div><p>请横屏游玩《风铃谷的四季》</p></div></div>
+
+<!-- 游戏舞台：Canvas 场景层 + DOM UI 层 -->
+<div id="stage">
+  <canvas id="scene" width="384" height="216"></canvas>
+
+  <!-- 加载屏 -->
+  <div id="loading" class="screen-layer">
+    <div class="loading-card">
+      <div class="loading-bell">🎐</div>
+      <h1>风铃谷的四季</h1>
+      <div class="loading-bar"><div id="loading-fill"></div></div>
+      <p id="loading-text">正在唤醒山谷…</p>
+    </div>
+  </div>
+
+  <!-- 标题屏 -->
+  <div id="title-screen" class="screen-layer hidden">
+    <div class="title-card">
+      <div class="title-bell">🎐</div>
+      <h1 class="game-title">风铃谷的四季</h1>
+      <p class="game-sub">Chime Valley</p>
+      <div class="title-menu">
+        <button id="btn-new" class="btn-title">开始新生活</button>
+        <button id="btn-continue" class="btn-title">继续（<span id="save-summary">—</span>）</button>
+        <button id="btn-howto" class="btn-title">玩法说明</button>
+      </div>
+      <p class="title-footer">🎧 建议戴上耳机 · 制作：<a href="https://github.com/wangshengithub" target="_blank" rel="noopener">wangshengithub</a></p>
+      <div class="title-links">
+        <a href="https://chime-valley.pages.dev/" target="_blank" rel="noopener">🎮 在线游玩</a>
+        <a href="https://pogglo.com/hankwangshen/chime-valley" target="_blank" rel="noopener">🎮 Pogglo 平台</a>
+        <a href="https://github.com/wangshengithub/chime-valley" target="_blank" rel="noopener">⭐ 开源仓库</a>
+      </div>
+      <div id="true-end-badge" class="true-end-badge hidden">🔔 已见证真结局 · 新的守护者</div>
+    </div>
+  </div>
+
+  <!-- 序章（开场叙事演出） -->
+  <div id="prologue" class="screen-layer hidden">
+    <div class="prologue-page" id="prologue-text"></div>
+    <div class="prologue-next">点击继续 ▼</div>
+  </div>
+
+  <!-- 命名屏 -->
+  <div id="name-screen" class="screen-layer hidden">
+    <div class="name-card">
+      <p>山路的尽头，你推开了那扇熟悉的木门。</p>
+      <p>信上只写着：「风铃谷的老屋，留给你。」</p>
+      <label for="name-input">你的名字是……</label>
+      <input id="name-input" maxlength="6" placeholder="竹鹿" autocomplete="off">
+      <button id="btn-name-ok" class="btn-title">开始山谷生活</button>
+      <p id="name-error" class="name-error"></p>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-left">
+      <div id="hud-date" class="hud-chip">春 · 第 1 天</div>
+      <div id="hud-weather" class="hud-chip">☀ 晴</div>
+      <div id="hud-spirit" class="hud-chip" title="本季限定精灵的收集进度">🔔 —</div>
+      <button id="hud-tip" class="hud-chip hud-tip" title="今日小贴士">💡 <span id="tip-text">…</span></button>
+    </div>
+    <div class="hud-right">
+      <div class="hud-chip">🪙 <span id="hud-gold">0</span></div>
+      <div class="hud-chip hud-stamina" title="体力">🍒 <span id="hud-energy"></span></div>
+    </div>
+    <div class="hud-bottom">
+      <button class="hud-btn" id="hud-bag" title="背包 (B)">🎒</button>
+      <button class="hud-btn" id="hud-journal" title="手账·图鉴 (J)">📖</button>
+      <button class="hud-btn" id="hud-map" title="地图 (M)">🗺️</button>
+      <button class="hud-btn" id="hud-settings" title="设置">⚙️</button>
+    </div>
+    <div id="scene-name" class="scene-name"></div>
+  </div>
+
+  <!-- 对话框 -->
+  <div id="dialogue" class="hidden">
+    <div id="dlg-speaker"></div>
+    <div id="dlg-text"></div>
+    <div id="dlg-next">▼</div>
+    <div id="dlg-choices"></div>
+  </div>
+
+  <!-- 回忆闪回模式 -->
+  <div id="memory" class="screen-layer hidden">
+    <div class="memory-card">
+      <div class="memory-title" id="memory-title"></div>
+      <div class="memory-text" id="memory-text"></div>
+      <button id="memory-ok" class="btn-title">合上回忆</button>
+    </div>
+  </div>
+
+  <!-- 通用面板容器（背包/图鉴/商店/料理/装修/设置/结算 等由 JS 填充） -->
+  <div id="panel" class="hidden"><div id="panel-card"></div></div>
+
+  <!-- 浮动提示 -->
+  <div id="toast-wrap"></div>
+
+  <!-- 转场遮罩 -->
+  <div id="transition"></div>
+  <!-- 结局层 -->
+  <div id="ending" class="screen-layer hidden"></div>
+</div>
+
+<!-- 音频数据 -->
+<script src="js/core/namespace.js"></script>
+<!-- 数据 -->
+<script src="js/data/crops.js"></script>
+<script src="js/data/recipes.js"></script>
+<script src="js/data/furniture.js"></script>
+<script src="js/data/items.js"></script>
+<script src="js/data/npcs.js"></script>
+<script src="js/data/spirits.js"></script>
+<script src="js/data/dialogues.js"></script>
+<script src="js/data/events.js"></script>
+<script src="js/data/shops.js"></script>
+<script src="js/data/scenes/farm.js"></script>
+<script src="js/data/scenes/court.js"></script>
+<script src="js/data/scenes/forest_edge.js"></script>
+<script src="js/data/scenes/valley_side.js"></script>
+<script src="js/data/scenes/home_living.js"></script>
+<script src="js/data/scenes/home_kitchen.js"></script>
+<script src="js/data/scenes/home_bedroom.js"></script>
+<script src="js/data/scenes/home_eaves.js"></script>
+<script src="js/data/scenes/town_street.js"></script>
+<script src="js/data/scenes/ranch.js"></script>
+<script src="js/data/scenes/deep_trail.js"></script>
+<script src="js/data/scenes/deep_inner.js"></script>
+<script src="js/data/scenes/valley_up.js"></script>
+<script src="js/data/scenes/hill_flower.js"></script>
+<script src="js/data/scenes/hill_rock.js"></script>
+<script src="js/data/scenes/spirit_realm.js"></script>
+<!-- 核心 -->
+<script src="js/core/assets.js"></script>
+<script src="js/core/audio.js"></script>
+<script src="js/core/input.js"></script>
+<script src="js/core/canvas.js"></script>
+<script src="js/core/fx.js"></script>
+<script src="js/core/light.js"></script>
+<script src="js/core/scene.js"></script>
+<script src="js/core/dialogue.js"></script>
+<script src="js/core/save.js"></script>
+<script src="js/core/engine.js"></script>
+<!-- 系统 -->
+<script src="js/systems/time.js"></script>
+<script src="js/systems/energy.js"></script>
+<script src="js/systems/inventory.js"></script>
+<script src="js/systems/economy.js"></script>
+<script src="js/systems/farm.js"></script>
+<script src="js/systems/cook.js"></script>
+<script src="js/systems/decorate.js"></script>
+<script src="js/systems/visit.js"></script>
+<script src="js/systems/npc.js"></script>
+<script src="js/systems/journal.js"></script>
+<script src="js/systems/spirits.js"></script>
+<script src="js/systems/story.js"></script>
+<script src="js/systems/guide.js"></script>
+<script src="js/systems/settings.js"></script>
+<script src="js/systems/ui.js"></script>
+<!-- 启动 -->
+<script src="js/main.js"></script>
+</body>
+</html>

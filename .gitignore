@@ -1,0 +1,7 @@
+# OS
+Thumbs.db
+.DS_Store
+
+# 临时
+*.log
+node_modules/
