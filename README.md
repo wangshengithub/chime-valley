@@ -11,7 +11,6 @@
 ### ⭐ 如果喜欢，求一个 Star 支持一下！
 
 [![开始游玩](https://img.shields.io/badge/%E2%96%B6_%E5%BC%80%E5%A7%8B%E6%B8%B8%E7%8E%A9-FF8BA7?style=for-the-badge)](https://chime-valley.pages.dev/)
-[![Pogglo](https://img.shields.io/badge/Pogglo%E5%B9%B3%E5%8F%B0-F2CE7E?style=for-the-badge)](https://pogglo.com/hankwangshen/chime-valley)
 [![Star](https://img.shields.io/badge/%E2%AD%90_%E6%B1%82Star-F2CE7E?style=for-the-badge)](https://github.com/wangshengithub/chime-valley)
 
 [![License](https://img.shields.io/badge/License-MIT-93B478?style=flat-square)](#-许可)
@@ -120,10 +119,9 @@
 
 ### 在线游玩（推荐）
 
-| 平台                   | 链接                                                                                   |
-| -------------------- | ------------------------------------------------------------------------------------ |
-| 官方（Cloudflare Pages） | [chime-valley.pages.dev](https://chime-valley.pages.dev/)                            |
-| Pogglo 平台            | [pogglo.com/hankwangshen/chime-valley](https://pogglo.com/hankwangshen/chime-valley) |
+| 平台                   | 链接                                                       |
+| -------------------- | ---------------------------------------------------------- |
+| 官方（Cloudflare Pages） | [chime-valley.pages.dev](https://chime-valley.pages.dev/)   |
 
 ### 本地运行
 
